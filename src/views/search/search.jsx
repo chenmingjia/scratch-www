@@ -111,25 +111,25 @@ class Search extends React.Component {
         }
         if (term.includes('spin') || term.includes('rotate') || term.includes('whirl')) {
             this.makeSurprise('isSpin');
-            setInterval(this.tick, 200);
+            setInterval(this.tick, 5);
         }
-        if (term.includes('color') || term.includes('rainbow')) {
+        if (term.includes('color') || term.includes('rainbow') || term.includes('colour')) {
             this.makeSurprise('isColor');
-            setInterval(this.tick, 200);
+            setInterval(this.tick, 50);
         }
         if (term.includes('ghost')) {
             this.makeSurprise('isGhost');
-            setInterval(this.tick, 200);
+            setInterval(this.tick, 20);
         }
         if (term.includes('brightness')) {
             this.makeSurprise('isBrightness');
-            setInterval(this.tick, 200);
+            setInterval(this.tick, 20);
         }
         if (term.includes('pixelate')) {
             this.makeSurprise('isPixelate');
-            setInterval(this.tick, 200);
+            setInterval(this.tick, 20);
         }
-        if (term.includes('fisheye')) {
+        if (term.includes('fisheye') || term.includes('fish eye')) {
             this.makeSurprise('isFisheye');
         }
 
@@ -194,7 +194,7 @@ class Search extends React.Component {
     }
     tick () {
         this.setState(prevState => (
-            {elapsed: (prevState.elapsed + 10)}
+            {elapsed: (prevState.elapsed + 1)}
         ));
     }
     getTab (type) {
@@ -265,38 +265,16 @@ class Search extends React.Component {
     fancyStyle () {
         const style = {};
         if (this.state.isSpin) {
-            style.transform = `rotate(${this.state.elapsed}deg)`;
+            style.transform = `rotate(${Math.min(this.state.elapsed, 360)}deg)`;
         }
         if (this.state.isColor) {
             style.filter = `hue-rotate(${this.state.elapsed}deg) saturate(400%)`;
         }
         if (this.state.isGhost) {
-            style.opacity= `${Math.min(1, this.state.elapsed / 100)}`;
+            style.opacity = `${Math.min(1, this.state.elapsed / 100)}`;
         }
         if (this.state.isBrightness) {
             style.filter = `brightness(${Math.max(1, 2 - (this.state.elapsed / 100))})`;
-        }
-        if (this.state.isPixelate && this.state.elapsed < 100) {
-            const radius = Math.max(2, 10 - ((this.state.elapsed) / 10));
-            const floodSize = radius > 1 ? Math.floor(radius - 1) : 1;
-            const pixelateEffect = `
-                <feFlood x="${floodSize}" y="${floodSize}" height="${(floodSize) / 2}" width="${(floodSize) / 2}" />
-                <feComposite width="${radius * 2}" height="${radius * 2}" />
-                <feTile result="a" />
-                <feComposite in="SourceGraphic" in2="a" operator="in" />
-                <feMorphology operator="dilate" radius="${radius}" />
-            `;
-
-            if (!this.pixelfilter) {
-                this.pixelfilter = document.createElementNS('http://www.w3.org/2000/svg', 'filter');
-                this.pixelfilter.setAttribute('x', 0);
-                this.pixelfilter.setAttribute('y', 0);
-                document.body.appendChild(this.pixelfilter);
-            }
-            this.pixelfilter.innerHTML = pixelateEffect;
-            this.pixelfilter.setAttribute('id', `pixelate`);
-
-            style.filter = `url(#pixelate)`;
         }
 
         return style;
